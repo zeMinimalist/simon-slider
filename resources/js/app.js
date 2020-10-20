@@ -105,15 +105,14 @@ $.fn.simonSlider = function(options) {
 		nav: true,
 		timer: false,
 		length: 5,
-		effect: 'fade'
+		effect: 'fade',
+		thumbnails: false
 	}, options);
 	let $slider = this;
 
 	// Initialize html structure
 	$slider.addClass('simon_slider');
-	$slider.prepend(
-		'<div class="simon_slider__button simon_slider__button--left"></div>'
-	);
+	$slider.prepend('<div class="simon_slider__button simon_slider__button--left"></div>');
 	$slider.find('ul').addClass('simon_slider__track').wrap('<div class="simon_slider__track-container">');
 	$slider.find('li').addClass('simon_slider__slide ' + settings.effect);
 	$slider.find('.simon_slider__slide').first().addClass('active');
@@ -158,6 +157,11 @@ $.fn.simonSlider = function(options) {
 			$slider.find('.simon_slider__slide').each(function(index) {
 				$nav.append('<div class="simon_slider__indicator ' + (index === 0 ? 'current-slide' : '') + '" data-position="' + (index + 1) + '"><div></div></div>');
 			});
+			if (settings.thumbnails) {
+				$slider.find('.simon_slider__slide').each(function(index) {
+					$nav.find('.simon_slider__indicator:eq(' + index + ')').addClass('thumbnail').find('div').append('<img src="' + $(this).attr('data-large-image') + '" />');
+				});
+			}
 		}
 	}
 
@@ -204,8 +208,15 @@ $.fn.simonSlider = function(options) {
 		$selected = $slider.find('.simon_slider__track .current-slide');
 		if (slidePosition) {
 			// go directly to requested slide
-			$selected.removeClass('current-slide');
 			$next = $slider.find('.simon_slider__track .simon_slider__slide:nth-child(' + slidePosition + ')');
+			$slider.find('.simon_slider__slide.active').remove('active');
+			$selected.addClass('active');
+			$next.addClass('active');
+			if (settings.effect == 'slide') {
+				if (!$slider.find('.simon_slider__slide').first().hasClass('slide-right')) {
+					$slider.find('.simon_slider__slide').removeClass('slide-left').addClass('slide-right');
+				}
+			}
 			$selected.removeClass('current-slide');
 			$next.addClass('current-slide');
 			updateNav($next.attr('data-position'));
@@ -227,12 +238,15 @@ $.fn.simonSlider = function(options) {
 		} else {
 			// get the selected item
 			// If prev li is empty, get the last
+			$prev = $selected.prev('li').length ? $selected.prev('li') : $last;
+			$slider.find('.simon_slider__slide.active').remove('active');
+			$selected.addClass('active');
+			$prev.addClass('active');
 			if (settings.effect == 'slide') {
 				if (!$slider.find('.simon_slider__slide').first().hasClass('slide-left')) {
 					$slider.find('.simon_slider__slide').removeClass('slide-right').addClass('slide-left');
 				}
 			}
-			$prev = $selected.prev('li').length ? $selected.prev('li') : $last;
 			$selected.removeClass('current-slide');
 			$prev.addClass('current-slide');
 			updateNav($prev.attr('data-position'));
