@@ -19619,7 +19619,17 @@ $.fn.simonSlider = function (options) {
     if (settings.timer) {
       $timer.text(seconds);
     }
-  }
+  } // touch logic
+
+
+  document.getElementById($slider.attr('id')).addEventListener('swiped-left', function (e) {
+    $slider.trigger('mouseover');
+    updateSlider('forward');
+  });
+  document.getElementById($slider.attr('id')).addEventListener('swiped-right', function (e) {
+    $slider.trigger('mouseover');
+    updateSlider('reverse');
+  });
 };
 
 /***/ }),
