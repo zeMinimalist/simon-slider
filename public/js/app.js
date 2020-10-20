@@ -19351,7 +19351,7 @@ $(function () {
 
   $slider.find('.slider__track li:first').addClass('current-slide');
   var windowWidth = $(window).width();
-  $(window).resize(function () {
+  $(window).on('resize', function () {
     checkImageSizes();
   });
 
@@ -19386,10 +19386,10 @@ $(function () {
   } // button logic
 
 
-  $slider.find('.slider__button--right').click(function () {
+  $slider.find('.slider__button--right').on('click', function () {
     updateSlider('forward');
   });
-  $slider.find('.slider__button--left').click(function () {
+  $slider.find('.slider__button--left').on('click', function () {
     updateSlider('reverse');
   }); // Automaticaly progress slider based on a timer
 
@@ -19405,7 +19405,7 @@ $(function () {
     clearTimeout(tid);
   }
 
-  $slider.hover(function () {
+  $slider.on('mouseover', function () {
     abortTimer();
   }); // slide logic
 
@@ -19446,10 +19446,181 @@ $(function () {
     $nav.find('.slider__indicator:nth-child(' + slidePosition + ')').addClass('current-slide');
   }
 
-  $nav.find('.slider__indicator').click(function () {
+  $nav.find('.slider__indicator').on('click', function () {
     updateSlider('forward', $nav.find('.slider__indicator').index(this) + 1);
   });
 });
+
+$.fn.simonSlider = function (options) {
+  // initialize settings against provided options
+  var settings = $.extend({
+    nav: true,
+    timer: false,
+    length: 5,
+    effect: 'fade'
+  }, options);
+  var $slider = this; // Initialize html structure
+
+  $slider.addClass('simon_slider');
+  $slider.prepend('<div class="simon_slider__button simon_slider__button--left"></div>');
+  $slider.find('ul').addClass('simon_slider__track').wrap('<div class="simon_slider__track-container">');
+  $slider.find('li').addClass('simon_slider__slide ' + settings.effect);
+  $slider.find('.simon_slider__slide').first().addClass('active');
+  $slider.append('<div class="simon_slider__button simon_slider__button--right"></div>'); // Initialize variables
+
+  var $first = $slider.find('.simon_slider__track li:first', 'ul');
+  var $last = $slider.find('.simon_slider__track li:last', 'ul');
+  var $nav, $timer; // Initialize opening state
+
+  $slider.find('.simon_slider__track li:first').addClass('current-slide');
+  var windowWidth = $(window).width();
+  $(window).on('resize', function () {
+    checkImageSizes();
+  });
+
+  function checkImageSizes() {
+    windowWidth = $(window).width();
+
+    if (windowWidth > 414) {
+      populateImages('large');
+    } else {
+      populateImages('small');
+    }
+
+    function populateImages(imageSize) {
+      $slider.find('.simon_slider__slide').each(function (index) {
+        $(this).html('<a href="' + $(this).attr('data-link') + '"><img src="' + $(this).attr('data-' + imageSize + '-image') + '" /></a>');
+      });
+    }
+  }
+
+  checkImageSizes();
+  $slider.find('.simon_slider__slide').each(function (index) {
+    $(this).attr('data-position', index + 1);
+  }); // initialize navigation
+
+  if (settings.nav) {
+    $slider.append('<div class="simon_slider__nav"></div>');
+    $nav = $slider.find('.simon_slider__nav'); // populate nav
+
+    if ($slider.find('.simon_slider__slide').length) {
+      $nav.show();
+      $slider.find('.simon_slider__slide').each(function (index) {
+        $nav.append('<div class="simon_slider__indicator ' + (index === 0 ? 'current-slide' : '') + '" data-position="' + (index + 1) + '"><div></div></div>');
+      });
+    }
+  } // initialize timer
+
+
+  if (settings.timer) {
+    $slider.append('<div class="simon_slider__timer"></div>');
+    $timer = $slider.find('.simon_slider__timer');
+  } // button logic
+
+
+  $slider.find('.simon_slider__button--right').on('click', function () {
+    updateSlider('forward');
+  });
+  $slider.find('.simon_slider__button--left').on('click', function () {
+    updateSlider('reverse');
+  }); // Automaticaly progress slider based on a timer
+
+  var seconds = settings.length;
+  var tid = setTimeout(timer, 1000);
+  updateTimer(seconds);
+
+  function timer() {
+    seconds--;
+
+    if (seconds === 0) {
+      updateSlider('forward');
+      seconds = settings.length;
+    }
+
+    updateTimer(seconds);
+    tid = setTimeout(timer, 1000);
+  }
+
+  function abortTimer() {
+    clearTimeout(tid);
+
+    if (settings.timer) {
+      $timer.hide();
+    }
+  }
+
+  $slider.on('mouseover', function () {
+    abortTimer();
+  }); // slide logic
+
+  function updateSlider() {
+    var direction = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'forward';
+    var slidePosition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var $next,
+        $prev,
+        $selected = $slider.find('.simon_slider__track .current-slide');
+
+    if (slidePosition) {
+      // go directly to requested slide
+      $selected.removeClass('current-slide');
+      $next = $slider.find('.simon_slider__track .simon_slider__slide:nth-child(' + slidePosition + ')');
+      $selected.removeClass('current-slide');
+      $next.addClass('current-slide');
+      updateNav($next.attr('data-position'));
+    } else if (direction == 'forward') {
+      // get the selected item
+      // If next li is empty , get the first
+      $next = $selected.next('li').length ? $selected.next('li') : $first;
+      $slider.find('.simon_slider__slide.active').remove('active');
+      $selected.addClass('active');
+      $next.addClass('active');
+
+      if (settings.effect == 'slide') {
+        if (!$slider.find('.simon_slider__slide').first().hasClass('slide-right')) {
+          $slider.find('.simon_slider__slide').removeClass('slide-left').addClass('slide-right');
+        }
+      }
+
+      $selected.removeClass('current-slide');
+      $next.addClass('current-slide');
+      updateNav($next.attr('data-position'));
+    } else {
+      // get the selected item
+      // If prev li is empty, get the last
+      if (settings.effect == 'slide') {
+        if (!$slider.find('.simon_slider__slide').first().hasClass('slide-left')) {
+          $slider.find('.simon_slider__slide').removeClass('slide-right').addClass('slide-left');
+        }
+      }
+
+      $prev = $selected.prev('li').length ? $selected.prev('li') : $last;
+      $selected.removeClass('current-slide');
+      $prev.addClass('current-slide');
+      updateNav($prev.attr('data-position'));
+    }
+  } // navigation logic
+
+
+  function updateNav(slidePosition) {
+    if (settings.nav) {
+      $nav.find('.simon_slider__indicator').removeClass('current-slide');
+      $nav.find('.simon_slider__indicator:nth-child(' + slidePosition + ')').addClass('current-slide');
+    }
+  }
+
+  if (settings.nav) {
+    $nav.find('.simon_slider__indicator').on('click', function () {
+      updateSlider('forward', $nav.find('.simon_slider__indicator').index(this) + 1);
+    });
+  } // timer logic
+
+
+  function updateTimer(seconds) {
+    if (settings.timer) {
+      $timer.text(seconds);
+    }
+  }
+};
 
 /***/ }),
 
