@@ -103,10 +103,10 @@ $.fn.simonSlider = function(options) {
 	// initialize settings against provided options
 	let settings = $.extend({
 		nav: true,
+		thumbnails: false,
 		timer: false,
 		length: 5,
-		effect: 'fade',
-		thumbnails: false
+		effect: 'fade'
 	}, options);
 	let $slider = this;
 
@@ -153,7 +153,6 @@ $.fn.simonSlider = function(options) {
 		$nav = $slider.find('.simon_slider__nav');
 		// populate nav
 		if ($slider.find('.simon_slider__slide').length) {
-			$nav.show();
 			$slider.find('.simon_slider__slide').each(function(index) {
 				$nav.append('<div class="simon_slider__indicator ' + (index === 0 ? 'current-slide' : '') + '" data-position="' + (index + 1) + '"><div></div></div>');
 			});

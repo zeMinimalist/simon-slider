@@ -20,8 +20,16 @@
 			<div class="slider__button slider__button--right"></div>
 			<div class="slider__nav"></div>
 		</div>
-		<p>Simon Slider v2</p>
+		<p>Simon Slider v2 (options {nav: true, timer: true, effect: 'slide'}</p>
 		<div id="simon_slider_v2">
+			<ul>
+				<li data-large-image="images/large/1.jpg" data-small-image="images/small/1.jpg" data-link="https://www.vaynercommerce.com"></li>
+				<li data-large-image="images/large/2.jpg" data-small-image="images/small/2.jpg" data-link="https://www.vaynercommerce.com"></li>
+				<li data-large-image="images/large/3.jpg" data-small-image="images/small/3.jpg" data-link="https://www.vaynercommerce.com"></li>
+			</ul>
+		</div>
+		<p>Simon Slider v2 (options {nav: true, thumbnails: true, effect: 'fade', length: 3}</p>
+		<div id="simon_slider_v2_2">
 			<ul>
 				<li data-large-image="images/large/1.jpg" data-small-image="images/small/1.jpg" data-link="https://www.vaynercommerce.com"></li>
 				<li data-large-image="images/large/2.jpg" data-small-image="images/small/2.jpg" data-link="https://www.vaynercommerce.com"></li>
@@ -37,6 +45,12 @@
 					nav: true,
 					timer: true,
 					effect: 'slide'
+				});
+				$('#simon_slider_v2_2').simonSlider({
+					nav: true,
+					thumbnails: true,
+					effect: 'fade',
+					length: 3
 				});
 			});
 		</script>
